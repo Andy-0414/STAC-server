@@ -13,6 +13,8 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.25"
+    "moment-timezone": "^0.5.25",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0"
   }
 }

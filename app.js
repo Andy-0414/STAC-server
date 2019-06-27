@@ -11,6 +11,7 @@ const app = express();
 
 const logger = require('./modules/logger')
 const router = require('./router/index')
+const passportJwt = require('./modules/passport-jwt-auth')
 
 app.listen(process.env.PORT || 80, () => {
     logger.logc("SERVER OPEN")

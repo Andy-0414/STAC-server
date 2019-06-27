@@ -14,7 +14,7 @@ var UserSchema = new Schema({
     },
     isAdmin: Boolean // 어드민 권한
 })
-
+    
 /**
  * @description 아이디로 유저를 찾습니다.
  * @param {*} id 유저 아이디
