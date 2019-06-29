@@ -12,7 +12,7 @@ const app = express();
 const logger = require('./modules/logger')
 const router = require('./router/index')
 const sendRule = require('./modules/send-rule')
-const passportJwt = require('./modules/passport-jwt-auth')
+const passportJwtAuth = require('./modules/passport-jwt-auth')()
 const mongo = require('./modules/mongo-connect').getDB()
 
 app.listen(process.env.PORT || 80, () => {
@@ -22,6 +22,7 @@ app.listen(process.env.PORT || 80, () => {
 app.use(express.static('public'))
 app.use(express.urlencoded());
 app.use(express.json())
+app.use(passportJwtAuth.initialize())
 
 app.use(router)
 

@@ -86,8 +86,8 @@ module.exports = {
      * @description 에러를 생성합니다.
      *
      * @param {number} [status=500] 응답 코드
-     * @param {*} message 에러 메세지
-     * @returns
+     * @param {string} message 에러 메세지
+     * @returns {Error} err
      */
     createError(status = 500, message) { // 에러 생성
         var err = new Error(message)
