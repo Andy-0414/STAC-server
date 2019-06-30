@@ -20,16 +20,16 @@ var obj = {
 var UserSchema = new Schema(obj)
 
 // 정적 메서드
-UserSchema.statics.requiredFields = function () {
+UserSchema.statics.requiredFields = function () { // 아이디 패스워드 키값
     return ["id", "password"] // 아이디 비밀번호 기본값
 }
-UserSchema.statics.isRequiredFieldsAble = function (obj) {
+UserSchema.statics.isRequiredFieldsAble = function (obj) { // 아이디 패스워드 유효성 검사
     return obj[this.requiredFields()[0]] && obj[this.requiredFields()[1]]
 }
-UserSchema.statics.getUserStatusList = function () {
+UserSchema.statics.getUserStatusList = function () { // User 스키마에 대한 키값 반환
     return Object.keys(obj)
 }
-UserSchema.statics.filterData = function (data) {
+UserSchema.statics.filterData = function (data) { // user 스키마에 맞는 데이터만 추출
     var obj = {}
     this.getUserStatusList().forEach(x => {
         if (data[x])
@@ -37,7 +37,7 @@ UserSchema.statics.filterData = function (data) {
     })
     return obj
 }
-UserSchema.statics.getUserById = function (id) {
+UserSchema.statics.getUserById = function (id) { // User ID로 User 검색
     return new Promise((resolve, reject) => {
         this.findOne({
             id: id
@@ -48,7 +48,7 @@ UserSchema.statics.getUserById = function (id) {
         })
     })
 }
-UserSchema.statics.loginValidation = function (id, password, callbackTrue, callbackFalse) {
+UserSchema.statics.loginValidation = function (id, password, callbackTrue, callbackFalse) { // id,password 입력으로 로그인 후 참,거짓 콜백 반환
     this.getUserById(id)
         .then(user => {
             if (user.checkPassword(password)) {
@@ -68,14 +68,14 @@ UserSchema.statics.loginValidation = function (id, password, callbackTrue, callb
             else callbackFalse(sendRule.createError(400), "계정이 존재하지 않음")
         })
 }
-UserSchema.statics.createToken = function(data){
+UserSchema.statics.createToken = function(data){ // 토큰 생성
     return "Bearer " + jwt.encode(data, process.env.DB_SECRET || "STAC")
 }
 // 메서드
-UserSchema.methods.checkPassword = function (pw) {
+UserSchema.methods.checkPassword = function (pw) { // 패스워드 유효성 검사
     return this.password == pw
 }
-UserSchema.methods.updateLastLogin = function () {
+UserSchema.methods.updateLastLogin = function () { // 마지막으로 로그인 한 날짜 갱신
     this.lastLogin = new Date()
     return new Promise((resolve, reject) => {
         this.save(err => {
@@ -84,7 +84,7 @@ UserSchema.methods.updateLastLogin = function () {
         })
     })
 }
-UserSchema.methods.getToken = function () {
+UserSchema.methods.getToken = function () { // 이 유저에 대한 토큰 생성
     return "Bearer " + jwt.encode(this, process.env.DB_SECRET || "STAC")
 }
 module.exports = mongoose.model('User', UserSchema);

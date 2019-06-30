@@ -25,9 +25,17 @@ module.exports = () => {
             })
     }))
     return {
+        /**
+         * @description passport initialize()
+         * @returns Express Middleware
+         */
         initialize() { // 기본
             return passport.initialize()
         },
+        /**
+         * @description login Middleware
+         * @returns Express Middleware
+         */
         authenticate() { // 로그인 시도
             return passport.authenticate('jwt', {
                 failWithError: true,
