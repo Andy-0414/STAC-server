@@ -14,6 +14,8 @@ const router = require('./router/index')
 const sendRule = require('./modules/send-rule')
 const passportJwtAuth = require('./modules/passport-jwt-auth')()
 const mongo = require('./modules/mongo-connect').getDB()
+const cors = require("cors")
+app.use(cors())
 
 app.listen(process.env.PORT || 80, () => {
     logger.logc("SERVER OPEN")
