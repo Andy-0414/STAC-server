@@ -12,8 +12,8 @@ module.exports.createUser = function (req, res, next) {
     var requestData = User.filterData(req.body)
     if (User.isRequiredFieldsAble(requestData)) {
         User.getUserById(requestData[User.requiredFields()[0]]).then(() => {
-            next(sendRule.createError(403, "이미 계정이 존재함"))
-        })
+                next(sendRule.createError(403, "이미 계정이 존재함"))
+            })
             .catch(err => {
                 if (err) next(err)
                 var newUser = new User(requestData)
@@ -62,7 +62,20 @@ module.exports.login = function (req, res, next) {
  * @param {*} res Express res
  */
 module.exports.changePassword = function (req, res, next) {
-    
+    var id = req.user[User.requiredFields()[0]]
+    var password = req.user[User.requiredFields()[1]]
+    var newPassword = req.body[User.requiredFields()[1]]
+    User.loginValidation(id, password,
+        (data, token) => {
+            data.password = newPassword
+            data.save(err => {
+                if (err) next(err)
+                sendRule.sendOK(res, token, "비밀번호 변경 성공")
+            })
+        },
+        err => {
+            next(err)
+        })
 }
 /**
  * @description 계정을 삭제합니다.
@@ -71,5 +84,16 @@ module.exports.changePassword = function (req, res, next) {
  * @param {*} res Express res
  */
 module.exports.removeUser = function (req, res, next) {
-    
+    var id = req.user[User.requiredFields()[0]]
+    var password = req.user[User.requiredFields()[1]]
+    User.loginValidation(id, password,
+        (data, token) => {
+            data.remove(err => {
+                if (err) next(err)
+                sendRule.sendOK(res, token, "계정 삭제 성공")
+            })
+        },
+        err => {
+            next(err)
+        })
 }
