@@ -12,6 +12,8 @@ export interface PasswordAndSalt {
  */
 export interface IUser {
 	email: string;
+	name?: string;
+	phone?: string;
 	password: string;
 	nickname?: string;
 	lastLogin?: Date;
@@ -104,7 +106,8 @@ export interface IUserModel extends Model<IUserSchema> {
 const UserSchema: Schema = new Schema({
 	email: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
-	nickname: { type: String },
+	name: { type: String },
+	phone: { type: String },
 	lastLogin: { type: Date, default: Date.now },
 	createAt: { type: Date, default: Date.now },
 	salt: { type: String, default: process.env.SECRET_KEY || "SECRET" }
@@ -130,8 +133,7 @@ UserSchema.methods.changePassword = function(this: IUserSchema, data: IUserChang
 };
 UserSchema.methods.changeInfomation = function(this: IUserSchema, data: IUser): Promise<IUserSchema> {
 	Object.keys(data).forEach(x => {
-		if (x in this && (x != "email" && x != "_id" && x != "password" && x != "salt" && x != "createAt"))
-			this[x] = data[x] || this[x];
+		if (x in this && (x != "email" && x != "_id" && x != "password" && x != "salt" && x != "createAt")) this[x] = data[x] || this[x];
 	});
 	return this.save();
 };
@@ -146,11 +148,7 @@ UserSchema.methods.updateLoginTime = function(this: IUserSchema): Promise<IUserS
 UserSchema.statics.dataCheck = function(this: IUserModel, data: any): boolean {
 	return "email" in data && "password" in data;
 };
-UserSchema.statics.loginValidation = function(
-	this: IUserModel,
-	data: IUser,
-	first: boolean = false
-): Promise<IUserSchema> {
+UserSchema.statics.loginValidation = function(this: IUserModel, data: IUser, first: boolean = false): Promise<IUserSchema> {
 	return new Promise<IUserSchema>((resolve, reject) => {
 		this.findByEmail(data.email)
 			.then((user: IUserSchema) => {
