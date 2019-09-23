@@ -9,6 +9,7 @@ export interface IPost {
 	owner?: ObjectID;
 	title: string;
 	content: string;
+	emotion: string;
 	imgPath?: string;
 	createAt?: Date;
 }
@@ -68,6 +69,7 @@ const PostSchema: Schema = new Schema({
 	owner: { type: ObjectID, required: true },
 	title: { type: String, required: true },
 	content: { type: String, required: true },
+	emotion: { type: String },
 	imgPath: { type: String },
 	createAt: { type: Date, default: Date.now }
 });
