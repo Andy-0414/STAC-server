@@ -43,6 +43,7 @@ export const Write = function(req: Request, res: Response, next: NextFunction) {
 		next(new StatusError(HTTPRequestCode.BAD_REQUEST, "잘못된 요청"));
 	}
 };
+
 /**
  * @description 내 글을 반환하는 라우터입니다.
  * @param {Request}req Express req
@@ -53,7 +54,14 @@ export const GetMyPosts = function(req: Request, res: Response, next: NextFuncti
 	let user = req.user as IUserSchema;
 	Post.findByOwner(user)
 		.then((posts: IPostSchema[]) => {
-			SendRule.response(res, HTTPRequestCode.OK, posts);
+			SendRule.response(
+				res,
+				HTTPRequestCode.OK,
+				posts.map(x => {
+					x.timeString = x.getLastTime();
+					return x;
+				})
+			);
 		})
 		.catch(err => next(err));
 };

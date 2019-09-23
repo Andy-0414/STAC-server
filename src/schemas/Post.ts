@@ -1,6 +1,10 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { ObjectID } from "bson";
 import { IUserSchema } from "./User";
+import * as moment from "moment";
+import "moment-timezone";
+moment.tz.setDefault("Asia/Seoul");
+moment.locale("ko");
 
 /**
  * @description Post 요구 데이터
@@ -11,6 +15,7 @@ export interface IPost {
 	content: string;
 	emotion: string;
 	imgPath?: string;
+	timeString?: string;
 	createAt?: Date;
 }
 /**
@@ -34,6 +39,7 @@ export interface IPostSchema extends IPost, Document {
 	 * @returns {boolean} 주인 여부를 반환합니다
 	 */
 	ownerCheck(owner: IUserSchema): boolean;
+	getLastTime(): string;
 }
 /**
  * @description Post 모델에 대한 정적 메서드 ( 테이블 )
@@ -71,6 +77,7 @@ const PostSchema: Schema = new Schema({
 	content: { type: String, required: true },
 	emotion: { type: String },
 	imgPath: { type: String },
+	timeString: { type: String },
 	createAt: { type: Date, default: Date.now }
 });
 
@@ -85,6 +92,11 @@ PostSchema.methods.changeInfomation = function(this: IPostSchema, data: IPost): 
 };
 PostSchema.methods.ownerCheck = function(this: IPostSchema, data: IUserSchema): boolean {
 	return data._id.equals(this.owner);
+};
+PostSchema.methods.getLastTime = function(this: IPostSchema): string {
+	return moment(this.createAt)
+		.startOf()
+		.fromNow();
 };
 
 PostSchema.statics.dataCheck = function(this: IPostSchema, data: any): boolean {
