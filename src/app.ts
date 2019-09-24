@@ -1,3 +1,5 @@
+//TODO: 부모 기능
+
 import * as express from "express";
 import * as cors from "cors";
 import * as helmet from "helmet";
