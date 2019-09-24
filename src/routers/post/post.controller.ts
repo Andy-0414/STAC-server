@@ -33,6 +33,7 @@ export const Write = function(req: Request, res: Response, next: NextFunction) {
 				})
 				.catch(err => next(err));
 		} else {
+            data.imgPath = ""
 			Post.createPost(user, data)
 				.then((post: IPostSchema) => {
 					SendRule.response(res, HTTPRequestCode.CREATE, post, "글 작성 성공");
