@@ -14,6 +14,7 @@ export interface IUser {
 	email: string;
 	name?: string;
 	phone?: string;
+	imgPath?: string;
 	password: string;
 	nickname?: string;
 	lastLogin?: Date;
@@ -108,6 +109,7 @@ const UserSchema: Schema = new Schema({
 	password: { type: String, required: true },
 	name: { type: String },
 	phone: { type: String },
+	imgPath: { type: String },
 	lastLogin: { type: Date, default: Date.now },
 	createAt: { type: Date, default: Date.now },
 	salt: { type: String, default: process.env.SECRET_KEY || "SECRET" }
@@ -176,7 +178,6 @@ UserSchema.statics.loginValidation = function(this: IUserModel, data: IUser, fir
 			.catch(err => reject(err));
 	});
 };
-type EMPW = { email: string; password: string };
 UserSchema.statics.getToken = function(this: IUserModel, data: IUser): string {
 	let user = {
 		email: data.email,
@@ -207,7 +208,8 @@ UserSchema.statics.createUser = function(this: IUserModel, data: IUser): Promise
 		this.createPassword(data.password)
 			.then((passsalt: PasswordAndSalt) => {
 				data.password = passsalt.password;
-				data.salt = passsalt.salt;
+                data.salt = passsalt.salt;
+                data.imgPath = "";
 				let user = new this(data);
 				user.save()
 					.then((data: IUserSchema) => {
