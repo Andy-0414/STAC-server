@@ -19,8 +19,8 @@ export const GetEmotion = function(req: Request, res: Response, next: NextFuncti
 				tmp.push(data[x][i]);
 			});
 			sendData.push(tmp);
-		}
-		if (data.length == 30) {
+        }
+		if (len == 30) {
 			axios
 				.post("http://35.200.96.46:8000/", { data: sendData })
 				.then(data => {
