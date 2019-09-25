@@ -2,7 +2,11 @@ import { Document, Schema, Model, model } from "mongoose";
 import { ObjectID } from "bson";
 import { IUserSchema } from "./User";
 import * as moment from "moment";
+import axios from "axios";
 import "moment-timezone";
+import { StatusError } from "../modules/Send-Rule";
+import { Translate } from "@google-cloud/translate";
+import Logger from "../modules/Logger";
 moment.tz.setDefault("Asia/Seoul");
 moment.locale("ko");
 
@@ -14,6 +18,7 @@ export interface IPost {
 	title: string;
 	content: string;
 	emotion: string;
+	emotionScore: number;
 	imgPath?: string;
 	timeString?: string;
 	createAt?: Date;
@@ -40,6 +45,7 @@ export interface IPostSchema extends IPost, Document {
 	 */
 	ownerCheck(owner: IUserSchema): boolean;
 	getLastTime(): string;
+	emotionAnalysis(): Promise<IUserSchema>;
 }
 /**
  * @description Post 모델에 대한 정적 메서드 ( 테이블 )
@@ -76,6 +82,7 @@ const PostSchema: Schema = new Schema({
 	title: { type: String, required: true },
 	content: { type: String, required: true },
 	emotion: { type: String },
+	emotionScore: { type: Number },
 	imgPath: { type: String },
 	timeString: { type: String },
 	createAt: { type: Date, default: Date.now }
@@ -99,11 +106,47 @@ PostSchema.methods.getLastTime = function(this: IPostSchema): string {
 		.fromNow();
 };
 
+PostSchema.methods.emotionAnalysis = function(this: IPostSchema): Promise<IPostSchema> {
+	return new Promise<IPostSchema>((resolve, reject) => {
+		let translate = new Translate({ projectId: "calcium-ratio-249108", key: process.env.GCP_APIKEY });
+		translate
+			.translate(this.content, "en")
+			.then(translateContent => {
+				axios
+					.post(
+						"https://stac.cognitiveservices.azure.com/text/analytics/v2.1/sentiment",
+						{ documents: [{ language: "en", id: "1", text: translateContent[0] }] },
+						{
+							headers: {
+								"Ocp-Apim-Subscription-Key": process.env.MS_APIKEY
+							}
+						}
+					)
+					.then(data => {
+						let score = parseFloat(data.data.documents[0].score);
+						if (score != NaN) {
+							this.emotionScore = score;
+							this.save()
+								.then(post => {
+									resolve(post);
+								})
+								.catch(err => reject(err));
+						} else {
+							reject(new StatusError(500, "데이터 변환 중 에러"));
+						}
+					})
+					.catch(err => reject(err));
+			})
+			.catch(err => reject(err));
+	});
+};
+
 PostSchema.statics.dataCheck = function(this: IPostSchema, data: any): boolean {
 	return "title" in data && "content" in data;
 };
 PostSchema.statics.createPost = function(this: IPostModel, owner: IUserSchema, data: IPost): Promise<IPostSchema> {
 	data.owner = owner._id;
+	data.emotionScore = -1;
 	let post = new this(data);
 	return new Promise((resolve, reject) => {
 		post.save()

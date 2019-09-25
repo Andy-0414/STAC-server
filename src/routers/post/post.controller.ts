@@ -131,3 +131,27 @@ export const Delete = function(req: Request, res: Response, next: NextFunction) 
 		next(new StatusError(HTTPRequestCode.BAD_REQUEST, "잘못된 요청"));
 	}
 };
+
+export const EmotionAnalysis = function(req: Request, res: Response, next: NextFunction) {
+	let user = req.user as IUserSchema;
+	let data = req.body;
+	if ("_id" in data) {
+		Post.findByID(data._id).then(post => {
+			if (post) {
+				if (post.ownerCheck(user)) {
+					post.emotionAnalysis()
+						.then(post => {
+							SendRule.response(res, 200, post, "글 감정 분석 성공");
+						})
+						.catch(err => next(err));
+				} else {
+					SendRule.response(res, HTTPRequestCode.NOT_FOUND, undefined, "존재하지 않음");
+				}
+			} else {
+				SendRule.response(res, HTTPRequestCode.FORBIDDEN, undefined, "권한 없음");
+			}
+		});
+	} else {
+		next(new StatusError(HTTPRequestCode.BAD_REQUEST, "잘못된 요청"));
+	}
+};
