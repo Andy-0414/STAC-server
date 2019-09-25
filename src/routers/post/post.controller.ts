@@ -155,3 +155,20 @@ export const EmotionAnalysis = function(req: Request, res: Response, next: NextF
 		next(new StatusError(HTTPRequestCode.BAD_REQUEST, "잘못된 요청"));
 	}
 };
+
+export const GetMyEmotionAverage = function(req: Request, res: Response, next: NextFunction) {
+	let user = req.user as IUserSchema;
+	Post.findByOwner(user)
+		.then((posts: IPostSchema[]) => {
+			let sum = 0;
+			let count = 0;
+			posts.forEach(x => {
+				if (x.emotionScore != -1) {
+					sum += x.emotionScore;
+					count++;
+				}
+			});
+			SendRule.response(res, HTTPRequestCode.OK, sum / count);
+		})
+		.catch(err => next(err));
+};
