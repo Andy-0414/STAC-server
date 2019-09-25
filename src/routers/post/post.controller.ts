@@ -33,7 +33,7 @@ export const Write = function(req: Request, res: Response, next: NextFunction) {
 				})
 				.catch(err => next(err));
 		} else {
-            data.imgPath = ""
+			data.imgPath = "";
 			Post.createPost(user, data)
 				.then((post: IPostSchema) => {
 					SendRule.response(res, HTTPRequestCode.CREATE, post, "글 작성 성공");
@@ -77,14 +77,18 @@ export const Modification = function(req: Request, res: Response, next: NextFunc
 	let data = req.body;
 	if ("_id" in data) {
 		Post.findByID(data._id).then(post => {
-			if (post.ownerCheck(user)) {
-				post.changeInfomation(data)
-					.then(post => {
-						SendRule.response(res, 200, post, "글 수정 성공");
-					})
-					.catch(err => next(err));
+			if (post) {
+				if (post.ownerCheck(user)) {
+					post.changeInfomation(data)
+						.then(post => {
+							SendRule.response(res, 200, post, "글 수정 성공");
+						})
+						.catch(err => next(err));
+				} else {
+					SendRule.response(res, HTTPRequestCode.FORBIDDEN, undefined, "권한 없음");
+				}
 			} else {
-				SendRule.response(res, HTTPRequestCode.FORBIDDEN, undefined, "권한 없음");
+				SendRule.response(res, HTTPRequestCode.NOT_FOUND, undefined, "존재하지 않음");
 			}
 		});
 	} else {
@@ -102,19 +106,23 @@ export const Delete = function(req: Request, res: Response, next: NextFunction) 
 	let data = req.body;
 	if ("_id" in data) {
 		Post.findByID(data._id).then(post => {
-			if (post.ownerCheck(user)) {
-				post.removePost()
-					.then((post: IPostSchema) => {
-						if (post.imgPath) {
-							fs.unlink(`public/${post.imgPath}`, err => {
-								if (err) next(err);
+			if (post) {
+				if (post.ownerCheck(user)) {
+					post.removePost()
+						.then((post: IPostSchema) => {
+							if (post.imgPath) {
+								fs.unlink(`public/${post.imgPath}`, err => {
+									if (err) next(err);
+									SendRule.response(res, 200, post, "글 제거 성공");
+								});
+							} else {
 								SendRule.response(res, 200, post, "글 제거 성공");
-							});
-						} else {
-							SendRule.response(res, 200, post, "글 제거 성공");
-						}
-					})
-					.catch(err => next(err));
+							}
+						})
+						.catch(err => next(err));
+				} else {
+					SendRule.response(res, HTTPRequestCode.NOT_FOUND, undefined, "존재하지 않음");
+				}
 			} else {
 				SendRule.response(res, HTTPRequestCode.FORBIDDEN, undefined, "권한 없음");
 			}
