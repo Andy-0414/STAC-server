@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "./src/app.ts",
+	"engines": {
+		"node": "8"
+	},
 	"scripts": {
 		"test": "mocha --timeout 10000 -r ts-node/register 'src/**/*.test.ts'",
 		"start": "npm run build && pm2 start ./pm2.json",
