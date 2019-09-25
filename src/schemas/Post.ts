@@ -6,7 +6,6 @@ import axios from "axios";
 import "moment-timezone";
 import { StatusError } from "../modules/Send-Rule";
 import { Translate } from "@google-cloud/translate";
-import Logger from "../modules/Logger";
 moment.tz.setDefault("Asia/Seoul");
 moment.locale("ko");
 

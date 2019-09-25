@@ -1,4 +1,4 @@
-import { Document, Schema, Model, model, DocumentQuery } from "mongoose";
+import { Document, Schema, Model, model } from "mongoose";
 import * as crypto from "crypto";
 import * as jwt from "jwt-simple";
 import { StatusError, HTTPRequestCode } from "../modules/Send-Rule";
