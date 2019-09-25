@@ -11,11 +11,20 @@ import SendRule, { HTTPRequestCode, StatusError } from "../../modules/Send-Rule"
 export const GetEmotion = function(req: Request, res: Response, next: NextFunction) {
 	let data = req.body.data;
 	if (data) {
+		let sendData = [];
+		let len = data[Object.keys(data)[0]].length;
+		for (let i = 0; i < len; i++) {
+			let tmp = [];
+			Object.keys(data).forEach(x => {
+				tmp.push(data[x][i]);
+			});
+			sendData.push(tmp);
+		}
 		if (data.length == 30) {
 			axios
-				.post("http://35.200.96.46:8000/", { data })
+				.post("http://35.200.96.46:8000/", { data: sendData })
 				.then(data => {
-                    console.log(data)
+					console.log(data);
 					SendRule.response(res, HTTPRequestCode.OK, data.data);
 				})
 				.catch(err => next(err));
