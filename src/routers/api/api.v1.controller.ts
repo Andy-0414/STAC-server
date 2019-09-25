@@ -24,7 +24,6 @@ export const GetEmotion = function(req: Request, res: Response, next: NextFuncti
 			axios
 				.post("http://35.200.96.46:8000/", { data: sendData })
 				.then(data => {
-					console.log(data);
 					SendRule.response(res, HTTPRequestCode.OK, data.data);
 				})
 				.catch(err => next(err));
