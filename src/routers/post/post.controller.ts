@@ -161,14 +161,26 @@ export const GetMyEmotionAverage = function(req: Request, res: Response, next: N
 	Post.findByOwner(user)
 		.then((posts: IPostSchema[]) => {
 			let sum = 0;
-			let count = 0;
 			posts.forEach(x => {
-				if (x.emotionScore != -1) {
-					sum += x.emotionScore;
-					count++;
+				switch (x.emotion) {
+					case "매우 나쁨":
+						sum += 0;
+						break;
+					case "나쁨":
+						sum += 0.25;
+						break;
+					case "보통":
+						sum += 0.5;
+						break;
+					case "좋음":
+						sum += 0.75;
+						break;
+					case "매우 좋음":
+						sum += 1;
+						break;
 				}
 			});
-			SendRule.response(res, HTTPRequestCode.OK, sum / count);
+			SendRule.response(res, HTTPRequestCode.OK, sum / posts.length);
 		})
 		.catch(err => next(err));
 };
