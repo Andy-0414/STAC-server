@@ -17,6 +17,7 @@ export interface IUser {
 	imgPath?: string;
 	password: string;
 	nickname?: string;
+	brainWaveDatas: number[]; // 0 그냥 1 좋아요 2 화나요
 	lastLogin?: Date;
 	createAt?: Date;
 	salt?: string;
@@ -110,6 +111,7 @@ const UserSchema: Schema = new Schema({
 	name: { type: String },
 	phone: { type: String },
 	imgPath: { type: String },
+	brainWaveDatas: { type: Array },
 	lastLogin: { type: Date, default: Date.now },
 	createAt: { type: Date, default: Date.now },
 	salt: { type: String, default: process.env.SECRET_KEY || "SECRET" }
@@ -208,8 +210,8 @@ UserSchema.statics.createUser = function(this: IUserModel, data: IUser): Promise
 		this.createPassword(data.password)
 			.then((passsalt: PasswordAndSalt) => {
 				data.password = passsalt.password;
-                data.salt = passsalt.salt;
-                data.imgPath = "";
+				data.salt = passsalt.salt;
+				data.imgPath = "";
 				let user = new this(data);
 				user.save()
 					.then((data: IUserSchema) => {
