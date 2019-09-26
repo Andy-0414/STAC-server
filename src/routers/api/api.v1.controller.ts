@@ -24,7 +24,7 @@ export const GetEmotion = function(req: Request, res: Response, next: NextFuncti
 		}
 		if (len == 30) {
 			axios
-				.post("http://35.200.96.46:8000/", { data: sendData })
+				.post("http://34.84.57.201:8000/", { data: sendData })
 				.then(data => {
 					let result = data.data as number;
 					user.brainWaveDatas.push(result);
